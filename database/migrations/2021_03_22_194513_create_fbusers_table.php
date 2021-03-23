@@ -15,6 +15,9 @@ class CreateFbusersTable extends Migration
     {
         Schema::create('fbusers', function (Blueprint $table) {
             $table->id();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('profile_pic');
             $table->timestamps();
         });
     }
