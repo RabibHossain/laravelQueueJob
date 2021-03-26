@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessUserData;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -11,23 +12,17 @@ class UserController extends Controller
         return view('upload');
     }
 
-    public function upload()
+    public function upload(Request $request)
     {
-        if (request()->has('mycsv')) {
-            $data   =   file(request()->mycsv);
-            // Chunking file
+        if (request()->has('csvFile')) {
+            $data = file(request()->csvFile);
+
             $chunks = array_chunk($data, 1000);
-
-            $header = [];
-
+//dd($chunks);
             foreach ($chunks as $key => $chunk) {
-                $data = array_map('str_getcsv', $chunk);
-
-                if ($key === 0) {
-                    $header = $data[0];
-                    unset($data[0]);
-                }
-
+                $name = "/tmp{$key}.csv";
+                $path = resource_path('temp');
+                file_put_contents($path . $name, $chunk);
             }
 
             return 'Done';
@@ -35,4 +30,24 @@ class UserController extends Controller
 
         return 'please upload file';
     }
+
+    public function store()
+    {
+        $path = resource_path('temp');
+        $files = glob("$path/*.csv");
+        $header = [];
+        foreach ($files as $key => $file) {
+            $data = array_map('str_getcsv', file($file));
+            if ($key === 0) {
+                $header = $data[0];
+                unset($data[0]);
+            }
+
+            ProcessUserData::dispatch($data, $header);
+            unlink($file);
+        }
+
+        return 'Stored';
+    }
+
 }

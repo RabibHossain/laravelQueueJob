@@ -20,3 +20,4 @@ Route::get('/', function () {
 
 Route::get('data-upload', [\App\Http\Controllers\UserController::class, 'index']);
 Route::post('data-upload', [\App\Http\Controllers\UserController::class, 'upload']);
+Route::get('data-store', [\App\Http\Controllers\UserController::class, 'store']);

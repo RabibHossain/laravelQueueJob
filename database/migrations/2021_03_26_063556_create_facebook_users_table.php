@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFbusersTable extends Migration
+class CreateFacebookUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateFbusersTable extends Migration
      */
     public function up()
     {
-        Schema::create('fbusers', function (Blueprint $table) {
+        Schema::create('facebook_users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('profile_pic');
+            $table->string('senderId');
+            $table->string('firstName');
+            $table->string('lastName');
+            $table->longText('profilePic');
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreateFbusersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fbusers');
+        Schema::dropIfExists('facebook_users');
     }
 }

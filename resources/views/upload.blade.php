@@ -6,7 +6,7 @@
     <title>Upload Million Records</title>
 </head>
 <body>
-<form action="/upload" method="post" enctype="multipart/form-data">
+<form action="/data-upload" method="post" enctype="multipart/form-data">
     @csrf
     <input type="file" name="csvFile" id="csvFile">
     <input type="submit" value="Submit">

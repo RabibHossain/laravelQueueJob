@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\FacebookUser;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,23 +14,39 @@ class ProcessUserData implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public $data;
+    public $header;
+
+    public function __construct($data,$header)
     {
-        //
+        $this->data = $data;
+        $this->header = $header;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
-        //
+        foreach ($this->data as $value) {
+            $fbUsers = array_combine($this->header, $value);
+            FacebookUser::create($fbUsers);
+        }
     }
-}
+
+        /*    */
+//        $path = resource_path('temp');
+//        $files = glob("$path/*.csv");
+//        $header = [];
+//        foreach ($files as $key => $file) {
+//            $data = array_map('str_getcsv', file($file));
+//            if ($key === 0) {
+//                $header = $data[0];
+//                unset($data[0]);
+//            }
+//            foreach ($data as $value) {
+//                $fbUsers = array_combine($header, $value);
+//                FacebookUsers::create($fbUsers);
+//            }
+//
+//            unlink($file);
+//        }
+
+    }
