@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessUserData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -16,38 +18,40 @@ class UserController extends Controller
     {
         if (request()->has('csvFile')) {
             $data = file(request()->csvFile);
-
             $chunks = array_chunk($data, 1000);
-//dd($chunks);
+            $header = [];
+
+            $batch = Bus::batch([])->dispatch();
+
             foreach ($chunks as $key => $chunk) {
-                $name = "/tmp{$key}.csv";
-                $path = resource_path('temp');
-                file_put_contents($path . $name, $chunk);
+                $data = array_map('str_getcsv', $chunk);
+                if ($key === 0) {
+                    $header = $data[0];
+                    unset($data[0]);
+                }
+                $batch->add(new ProcessUserData($data, $header));
             }
 
-            return 'Done';
+            return $batch;
         }
 
         return 'please upload file';
     }
 
-    public function store()
+    public function batch()
     {
-        $path = resource_path('temp');
-        $files = glob("$path/*.csv");
-        $header = [];
-        foreach ($files as $key => $file) {
-            $data = array_map('str_getcsv', file($file));
-            if ($key === 0) {
-                $header = $data[0];
-                unset($data[0]);
-            }
+        $batchId = request('id');
 
-            ProcessUserData::dispatch($data, $header);
-            unlink($file);
+        return Bus::findBatch($batchId);
+    }
+
+    public function pendingBatch()
+    {
+        $batches = DB::table('job_batches')->where('pending_jobs', '>', 0)->get();
+        if (count($batches) > 0) {
+            return Bus::findBatch($batches[0]->id);
         }
-
-        return 'Stored';
+        return [];
     }
 
 }

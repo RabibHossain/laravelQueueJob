@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\FacebookUser;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 
 class ProcessUserData implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $data;
     public $header;
@@ -31,22 +32,9 @@ class ProcessUserData implements ShouldQueue
         }
     }
 
-        /*    */
-//        $path = resource_path('temp');
-//        $files = glob("$path/*.csv");
-//        $header = [];
-//        foreach ($files as $key => $file) {
-//            $data = array_map('str_getcsv', file($file));
-//            if ($key === 0) {
-//                $header = $data[0];
-//                unset($data[0]);
-//            }
-//            foreach ($data as $value) {
-//                $fbUsers = array_combine($header, $value);
-//                FacebookUsers::create($fbUsers);
-//            }
-//
-//            unlink($file);
-//        }
+    public function failed(\Throwable $exception)
+    {
+
+    }
 
     }
